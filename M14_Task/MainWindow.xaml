@@ -1,0 +1,382 @@
+﻿<Window x:Class="M14_Task.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:M14_Task"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="500" Width="800" Closed="OnClosed">
+    <Window.Resources>
+        <!--шаблон клиента Person для вывода в списке клиентов ClientList-->
+            <DataTemplate x:Key="PersonTemplate">
+            <Border BorderBrush="Black" Margin="5" BorderThickness="1" CornerRadius="10">
+                <StackPanel Margin="5">
+                    <TextBlock>Физическое лицо:</TextBlock>
+                    <TextBlock>
+                        <Run>ФИО: </Run>
+                        <Run Text="{Binding FamilyName}"/>
+                        <Run Text="{Binding FirstName}"/>
+                        <Run Text="{Binding PatronymicName}"/>
+                    </TextBlock>
+                </StackPanel>
+            </Border>
+        </DataTemplate>
+
+        <!--шаблон клиента Organisation для вывода в списке клиентов ClientList-->
+        <DataTemplate x:Key="OrganisationTemplate">
+            <Border BorderBrush="Black" Margin="5" BorderThickness="1" CornerRadius="10">
+                <StackPanel Margin="5">
+                    <TextBlock>Юридическое лицо:</TextBlock>
+                    <TextBlock>Название/ИНН:</TextBlock>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="{Binding OrganizationName}"/>
+                        <TextBlock> /</TextBlock>
+                        <TextBlock Text="{Binding INN}"/>
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+        </DataTemplate>
+
+        <DataTemplate x:Key="NullTemplate">
+            <StackPanel Margin="5">
+                <TextBlock>Клиент не выбран</TextBlock>
+            </StackPanel>
+        </DataTemplate>
+
+        <!--шаблон клиента Person для вывода в окне консультанта-->
+        <DataTemplate x:Key="PersonConsultantTemplate">
+            <StackPanel Margin="5">
+                <TextBlock>Физическое лицо:</TextBlock>
+                <TextBlock>
+                        <Run>ФИО: </Run>
+                        <Run Text="{Binding FamilyName}"/>
+                        <Run Text="{Binding FirstName}"/>
+                        <Run Text="{Binding PatronymicName}"/>
+                </TextBlock>
+                <TextBlock>телефон:</TextBlock>
+                <TextBox Text="{Binding Phone}"/>
+            </StackPanel>
+        </DataTemplate>
+
+        <!--шаблон клиента Organisation для вывода в окне консультанта-->
+        <DataTemplate x:Key="OrganisationConsultantTemplate">
+            <StackPanel Margin="5">
+                <TextBlock>Юридическое лицо:</TextBlock>
+                <TextBlock>
+                    <Run>Название:</Run>
+                    <Run Text="{Binding OrganizationName}"/>
+                </TextBlock>
+                <TextBlock>
+                    <Run>ИНН:</Run>
+                    <Run Text="{Binding INN}"/>
+                </TextBlock>
+                <TextBlock>
+                    <Run>Руководитель:</Run>
+                    <Run Text="{Binding Representative}"/>
+                </TextBlock>
+                <TextBlock>телефон:</TextBlock>
+                <TextBox Text="{Binding Phone}"/>
+
+            </StackPanel>
+        </DataTemplate>
+
+        <!--шаблон для внесения изменений в данные клиента Person-->
+        <DataTemplate x:Key="ChangePersonTemplate">
+            <StackPanel Margin="5">
+                <TextBlock>Физическое лицо:</TextBlock>
+                <TextBlock>Фамилия:</TextBlock>
+                <TextBox Text="{Binding FamilyName}"/>
+                <TextBlock>Имя:</TextBlock>
+                <TextBox  Text="{Binding FirstName}"/>
+                <TextBlock>Отчетсво:</TextBlock>
+                <TextBox Text="{Binding PatronymicName}"/>
+                <TextBlock>телефон:</TextBlock>
+                <TextBox Text="{Binding Phone}"/>
+            </StackPanel>
+        </DataTemplate>
+
+ 
+        <!--шаблон для внесения изменений в данные клиента Organisation-->
+        <DataTemplate x:Key="ChangeOrganisationTemplate">
+            <StackPanel Margin="5">
+                <TextBlock>Юридическое лицо:</TextBlock>
+                <TextBlock>Название:</TextBlock>
+                <TextBox Text="{Binding OrganizationName}"/>
+                <TextBlock>ИНН:</TextBlock>
+                <TextBox Text="{Binding INN}"/>
+                <TextBlock>Руководитель:</TextBlock>
+                <TextBox Text="{Binding Representative}"/>
+                <TextBlock>телефон:</TextBlock>
+                <TextBox Text="{Binding Phone}"/>
+            </StackPanel>
+        </DataTemplate>
+
+
+        <!--селектор для выбора шаблонов для списка клиентов-->
+        <local:TemplateSelectorClientList x:Key="myClientListTemplateSelector"               
+                                PersonTemplate="{StaticResource PersonTemplate}"
+                                OrganisationTemplate="{StaticResource OrganisationTemplate}"
+                                NullTemplate ="{StaticResource NullTemplate}"
+                                />
+        <!--селектор для выбора шаблонов в окне консультанта-->
+        <local:TemplateSelectorConsultantChoice x:Key="myConsultantTemplateSelector"               
+                                PersonConsultantTemplate="{StaticResource PersonConsultantTemplate}"
+                                OrganisationConsultantTemplate="{StaticResource OrganisationConsultantTemplate}"
+                                NullTemplate ="{StaticResource NullTemplate}"
+                                />
+
+        <!--селектор для выбора шаблонов для изменения данных о клиенте-->
+        <local:TemplateSelectorClientBuilding x:Key="myClientBuildingSelector"               
+                                ChangePersonTemplate="{StaticResource ChangePersonTemplate}"
+                                ChangeOrganisationTemplate="{StaticResource ChangeOrganisationTemplate}"
+                                NullTemplate ="{StaticResource NullTemplate}"
+                                />
+
+        <!--шаблон счета-->
+        <DataTemplate x:Key="AccountTemplate">
+            <StackPanel Margin="5">
+                <TextBlock>
+                    <Run>Счет:</Run>
+                    <Run Text="{Binding AccountNumber, Mode=OneWay}"/>
+                    <Run>(</Run>
+                    <Run Text="{Binding TimeCreate, Mode=OneTime,StringFormat='MM.dd.yyyy H:mm:ss'}"/>
+                    <Run>,</Run>
+                    <Run Text="{Binding TimeClose, Mode=OneWay,StringFormat='MM.dd.yyyy H:mm:ss'}"/>
+                    <Run>)</Run>
+                    <Run Text="{Binding Balance, Mode=OneWay}"/>
+                </TextBlock>
+            </StackPanel>
+        </DataTemplate>
+
+
+        <!--шаблон депозита-->
+        <DataTemplate x:Key="DepositAccountTemplate">
+            <StackPanel Margin="5">
+                <TextBlock>
+                    <Run>Депозит:</Run>
+                    <Run Text="{Binding AccountNumber, Mode=OneWay}"/>
+                    <Run>(</Run>
+                    <Run Text="{Binding TimeCreate, Mode=OneTime,StringFormat='MM.dd.yyyy H:mm:ss'}"/>
+                    <Run>,</Run>
+                    <Run Text="{Binding TimeClose, Mode=OneWay,StringFormat='MM.dd.yyyy H:mm:ss'}"/>
+                    <Run>)</Run>
+                    <Run Text="{Binding Balance, Mode=OneWay}"/>
+                </TextBlock>
+            </StackPanel>
+        </DataTemplate>
+
+        <!--селектор для выбора счет/депозит-->
+        <local:TempAccountSelector x:Key="myAccountSelector"               
+                                AccountTemplate="{StaticResource AccountTemplate}"
+                                DepositAccountTemplate="{StaticResource DepositAccountTemplate}"
+                                />
+
+    </Window.Resources>
+    <Grid>
+
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="0.3*"/>
+            <ColumnDefinition Width="5"/>
+            <ColumnDefinition Width="0.7*"/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="20"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="0.5*"/>
+        </Grid.RowDefinitions>
+        <!--касса-->
+        <StackPanel Grid.Row="0" Grid.Column="0" Orientation="Horizontal">
+            <TextBlock  Text="Касса:"/>
+            <TextBlock x:Name="cash" Text="{Binding Path=Balance}"/>
+        </StackPanel>
+        <!--список клиентов-->
+        <ScrollViewer Grid.Row="1" Grid.Column="0">
+            <ListBox x:Name="ClientList" SelectionChanged="ClientList_SelectionChanged" 
+                     ItemTemplateSelector="{StaticResource myClientListTemplateSelector}"/>
+        </ScrollViewer>
+
+        <!--счета выбранного клиента-->
+        <StackPanel Grid.Row="2" Grid.Column="0">
+            <TextBlock Text="Счета:"/>
+            <ListBox x:Name="AccountList" 
+                     ItemTemplateSelector="{StaticResource myAccountSelector}"/>
+        </StackPanel>
+        
+        <!--приветственное сообщение менеджера/консультанта банка-->
+        <StackPanel Grid.Row="0" Grid.Column="2" Orientation="Horizontal">
+            <TextBlock x:Name="helloMessage" Text=""/>
+        </StackPanel>
+
+        <TabControl Grid.Row="1" Grid.Column="2" SelectionChanged="TabControl_SelectionChanged">
+            <!--функционал менеджера по работе с новыми клиентами-->
+            <TabItem x:Name="managerForNewClient" Header="новые клиенты">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="0.45*"/>
+                        <ColumnDefinition Width="0.05*"/>
+                        <ColumnDefinition Width="0.5*"/>
+                    </Grid.ColumnDefinitions>
+                    <StackPanel Grid.Column="0">
+                        <TextBlock>Клиент банка:</TextBlock>
+                        <ContentControl 
+                                    Content="{Binding TheClient}" 
+                                    ContentTemplateSelector="{StaticResource myClientBuildingSelector}"/>
+
+                    </StackPanel>
+                    <StackPanel Grid.Column="2">
+                        <Button Click="ButtonManagerForNewClientStart_Click">Выбрать клиента</Button>
+                        <Button Click="ButtonManagerForNewClientFinish_Click">Закончить работу с клиентом</Button>
+                        <Button Click="ButtonNewOrganisation_Click">Новый клиент: юридическое лицо</Button>
+                        <Button Click="ButtonNewPerson_Click">Новый клиент: физическое лицо</Button>
+                    </StackPanel>
+                </Grid>
+            </TabItem>
+            <!--функционал менеджера по работе со счетами-->
+            <TabItem x:Name="accountManager" Header="обычные счета">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="0.45*"/>
+                        <ColumnDefinition Width="0.05*"/>
+                        <ColumnDefinition Width="0.5*"/>
+                    </Grid.ColumnDefinitions>
+                    <StackPanel Grid.Column="0">
+                        <TextBlock>Клиент банка:</TextBlock>
+                        <ContentControl  
+                                    Content="{Binding TheClient}" 
+                                    ContentTemplateSelector="{StaticResource myConsultantTemplateSelector}"/>
+                        <TextBlock Text="Счета:"/>
+                        <ListBox x:Name="accountListOfAccountManager" 
+                                 ItemsSource="{Binding Path=TheClient.Accounts}" 
+                                 ItemTemplateSelector="{StaticResource myAccountSelector}"
+                                 SelectionChanged="accountListOfAccountManager_SelectionChanged"/>
+                    </StackPanel>
+                    <StackPanel Grid.Column="2">
+                        <Button Click="ButtonAccountManagerStart_Click">Выбрать клиента</Button>
+                        <Button Click="ButtonAccountManagerFinish_Click">Закончить работу с клиентом</Button>
+                        <Button Click="ButtonNewAccount_Click">Открыть счет</Button>
+                        <Button Click="ButtonCloseAccount_Click">Закрыть счет</Button>
+                        
+                        <TextBlock>Сумма:</TextBlock>
+                        <TextBox x:Name="amount"/>
+                        <TextBlock>
+                            <Run>Счет:</Run> 
+                            <Run x:Name="selectedAccount"/>
+                        </TextBlock>
+                        
+                        <Button Click="ButtonCashAdd_Click">Внести наличные в кассу</Button>
+                        <Button Click="ButtonPutMoneyToAccount_Click">Положить на счет</Button>
+                        <Button Click="ButtonTakeMoneyFromAccount_Click">Снять со счета</Button>
+                        <TextBlock >Счет другого клиента:</TextBlock>
+                        <TextBox x:Name="putAccount"></TextBox>
+                        <Button Click="ButtonTransfer_Click">Перевод</Button>
+                                                                       
+                    </StackPanel>
+                </Grid>
+            </TabItem>
+            <!--функционал менеджера по работе с депозитами-->
+            <TabItem x:Name="depositManager" Header="депозиты">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="0.45*"/>
+                        <ColumnDefinition Width="0.05*"/>
+                        <ColumnDefinition Width="0.5*"/>
+                    </Grid.ColumnDefinitions>
+                    <StackPanel Grid.Column="0">
+                        <TextBlock>Клиент банка:</TextBlock>
+                        <ContentControl  
+                                    Content="{Binding TheClient}" 
+                                    ContentTemplateSelector="{StaticResource myConsultantTemplateSelector}"/>
+                        <TextBlock Text="Счета:"/>
+                        <ListBox x:Name="accountListOfDepositManager"
+                            ItemsSource="{Binding Path=TheClient.Accounts}" 
+                            ItemTemplateSelector="{StaticResource myAccountSelector}"
+                            SelectionChanged="accountListOfDepositManager_SelectionChanged"
+                            />
+                    </StackPanel>
+                    <StackPanel Grid.Column="2">
+                        <Button Click="ButtonDepositManagerStart_Click">Выбрать клиента</Button>
+                        <Button Click="ButtonDepositManagerFinish_Click">Закончить работу с клиентом</Button>
+                        <Button Click="ButtonNewDeposit_Click">Открыть депозит</Button>
+                        <Button Click="ButtonCloseDeposit_Click">Закрыть депозит</Button>
+                        <TextBlock>Сумма:</TextBlock>
+                        <TextBox x:Name="amount2"/>
+                        <TextBlock>
+                            <Run>Счет:</Run> 
+                            <Run x:Name="selectedAccount2"/>
+                        </TextBlock>
+                        <TextBlock>
+                            <Run>Депозит:</Run> 
+                            <Run x:Name="selectedDeposit"/>
+                        </TextBlock>
+                        <Button Click="ButtonPutMoneyToDeposit_Click">Вклад на депозит</Button>
+                        <Button Click="ButtonTakeMoneyFromDeposit_Click">Снять с депозита</Button>
+                    </StackPanel>
+                </Grid>
+            </TabItem>
+            <!--функционал консультанта-->
+            <TabItem x:Name="consultant" Header="консультация">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="0.45*"/>
+                        <ColumnDefinition Width="0.05*"/>
+                        <ColumnDefinition Width="0.5*"/>
+                    </Grid.ColumnDefinitions>
+                    <StackPanel Grid.Column="0">
+                        <TextBlock>Клиент банка:</TextBlock>
+                        <ContentControl  
+                                    Content="{Binding TheClient}" 
+                                    ContentTemplateSelector="{StaticResource myConsultantTemplateSelector}"/>
+
+                    </StackPanel>
+                    <StackPanel Grid.Column="2">
+                        
+                        <TextBlock>Для клиентов:</TextBlock>
+                        <Button Click="ButtonToAccountManager_Click">счета</Button>
+                        <Button Click="ButtonToDepositManager_Click">депозиты</Button>
+                        <TextBlock>Для иных лиц:</TextBlock>
+                        <Button Click="ButtonToNewClientManager_Click">Стать клиентом</Button>
+                    </StackPanel>
+                </Grid>
+            </TabItem>
+            
+        </TabControl>
+        <!--журналы-->
+        <TabControl Grid.Row="2" Grid.Column="2">
+            <TabItem Header="история переводов">
+                <ScrollViewer>
+                    <DataGrid x:Name="transfers" AutoGenerateColumns="False">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Дата/Втемя" Binding="{Binding Path=Time}" Width="140"/>
+                            <DataGridTextColumn Header="Исполнитель" Binding="{Binding Path=ManagerName}" Width="50"/>
+                            <DataGridTextColumn Header="Ид.отправителя" Binding="{Binding Path=GetClientId}" Width="50"/>
+                            <DataGridTextColumn Header="Имя отправителя" Binding="{Binding Path=GetClientName}" Width="150"/>
+                            <DataGridTextColumn Header="Тип счета" Binding="{Binding Path=GetAccountType}" Width="50"/>
+                            <DataGridTextColumn Header="Счет" Binding="{Binding Path=GetAccount}" Width="50"/>
+                            <DataGridTextColumn Header="Ид. получателя" Binding="{Binding Path=PutClientId}" Width="50"/>
+                            <DataGridTextColumn Header="Имя получателя" Binding="{Binding Path=PutClientName}" Width="150"/>
+                            <DataGridTextColumn Header="тип счета" Binding="{Binding Path=PutAccountType}" Width="50"/>
+                            <DataGridTextColumn Header="Счет" Binding="{Binding Path=PutAccount}" Width="50"/>
+                            <DataGridTextColumn Header="Сумма" Binding="{Binding Path=Ammount}" Width="50"/>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </ScrollViewer>
+            </TabItem>
+            <TabItem Header="история изменения данных о клиентах">
+                <ScrollViewer>
+                    <DataGrid x:Name="clientChangeHistory" AutoGenerateColumns="False">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Дата/время" Binding="{Binding Time}" Width="150" />
+                            <DataGridTextColumn Header="Исполнитель" Binding="{Binding ManagerName}" Width="90" />
+                            <DataGridTextColumn Header="Ид. клиента" Binding="{Binding ClientId}" Width="50" />
+                            <DataGridTextColumn Header="Имя/Название" Binding="{Binding ClientName}" Width="150" />
+                            <DataGridTextColumn Header="Изменение" Binding="{Binding Property}" Width="100" />
+                            <DataGridTextColumn Header="Значение" Binding="{Binding PropertyNewValue}" Width="100" />
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </ScrollViewer>
+            </TabItem>
+            
+        </TabControl>
+       
+    </Grid>
+</Window>

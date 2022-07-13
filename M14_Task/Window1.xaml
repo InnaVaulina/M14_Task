@@ -1,0 +1,26 @@
+﻿<Window x:Class="M14_Task.Window1"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:M14_Task"
+        mc:Ignorable="d"
+        Title="Юридическое лицо:" WindowStartupLocation="CenterScreen" Height="400" Width="300" IsVisibleChanged="OnDeactivate">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <StackPanel Grid.Column="0" Margin="5">
+               
+                <TextBlock>Название:</TextBlock>
+                <TextBox x:Name="newOrganizationName"/>
+                <TextBlock>ИНН:</TextBlock>
+                <TextBox x:Name="newINN"/>
+                <TextBlock>Руководитель:</TextBlock>
+                <TextBox x:Name="newRepresentative"/>
+            <Button Click="Button_Click">Сохранить</Button>
+        </StackPanel>
+
+    </Grid>
+</Window>
