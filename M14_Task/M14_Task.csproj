@@ -116,7 +116,7 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\М13_Task1\М13_Task1\М13_Task1.csproj">
+    <ProjectReference Include="..\М13_Task1\М13_Task1\М13_Task1.csproj">
       <Project>{aa911307-fc83-453d-9674-50373850d3c5}</Project>
       <Name>М13_Task1</Name>
     </ProjectReference>

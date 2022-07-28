@@ -4,8 +4,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 VisualStudioVersion = 17.1.32407.343
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "M14_Task", "M14_Task\M14_Task.csproj", "{24295EA3-50D7-4E31-A473-ACC23ED70A14}"
+	ProjectSection(ProjectDependencies) = postProject
+		{AA911307-FC83-453D-9674-50373850D3C5} = {AA911307-FC83-453D-9674-50373850D3C5}
+	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "М13_Task1", "..\М13_Task1\М13_Task1\М13_Task1.csproj", "{AA911307-FC83-453D-9674-50373850D3C5}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "М13_Task1", "М13_Task1\М13_Task1\М13_Task1.csproj", "{AA911307-FC83-453D-9674-50373850D3C5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
