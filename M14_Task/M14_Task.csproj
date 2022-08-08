@@ -69,13 +69,13 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="AccountManager.cs" />
+    <Compile Include="Manager\AccountManager.cs" />
     <Compile Include="TemplateSelector.cs" />
-    <Compile Include="History.cs" />
-    <Compile Include="ManagerForNewClient.cs" />
-    <Compile Include="DepositManager.cs" />
-    <Compile Include="Consultant.cs" />
-    <Compile Include="User.cs" />
+    <Compile Include="History\History.cs" />
+    <Compile Include="Manager\ManagerForNewClient.cs" />
+    <Compile Include="Manager\DepositManager.cs" />
+    <Compile Include="Manager\Consultant.cs" />
+    <Compile Include="Manager\User.cs" />
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
@@ -116,7 +116,7 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\М13_Task1\М13_Task1\М13_Task1.csproj">
+    <ProjectReference Include="..\..\М13_Task1\М13_Task1\М13_Task1.csproj">
       <Project>{aa911307-fc83-453d-9674-50373850d3c5}</Project>
       <Name>М13_Task1</Name>
     </ProjectReference>

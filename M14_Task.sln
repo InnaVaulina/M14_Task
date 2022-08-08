@@ -8,7 +8,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "M14_Task", "M14_Task\M14_Ta
 		{AA911307-FC83-453D-9674-50373850D3C5} = {AA911307-FC83-453D-9674-50373850D3C5}
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "М13_Task1", "М13_Task1\М13_Task1\М13_Task1.csproj", "{AA911307-FC83-453D-9674-50373850D3C5}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "М13_Task1", "..\М13_Task1\М13_Task1\М13_Task1.csproj", "{AA911307-FC83-453D-9674-50373850D3C5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
