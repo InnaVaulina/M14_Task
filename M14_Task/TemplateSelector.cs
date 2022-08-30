@@ -21,9 +21,9 @@ namespace M14_Task
                 string type = item.GetType().ToString();
                 switch (type)
                 {
-                    case "М13_Task1.Organization":
+                    case "M13_Library.Organization":
                         return OrganisationTemplate;
-                    case "М13_Task1.Person":
+                    case "M13_Library.Person":
                         return PersonTemplate;
                     default: return NullTemplate;
                 }    
@@ -50,9 +50,9 @@ namespace M14_Task
                 string type = item.GetType().ToString();
                 switch (type)
                 {
-                    case "М13_Task1.Organization":
+                    case "M13_Library.Organization":
                         return OrganisationConsultantTemplate;
-                    case "М13_Task1.Person":
+                    case "M13_Library.Person":
                         return PersonConsultantTemplate;
                     default: return NullTemplate;
                 }
@@ -79,9 +79,9 @@ namespace M14_Task
                 string type = item.GetType().ToString();
                 switch (type)
                 {
-                    case "М13_Task1.Organization":
+                    case "M13_Library.Organization":
                         return ChangeOrganisationTemplate;
-                    case "М13_Task1.Person":
+                    case "M13_Library.Person":
                         return ChangePersonTemplate;
                     default: return NullTemplate;
                 }
@@ -106,9 +106,9 @@ namespace M14_Task
                 string type = item.GetType().ToString();
                 switch (type)
                 {
-                    case "М13_Task1.Account":
+                    case "M13_Library.Account":
                         return AccountTemplate;
-                    case "М13_Task1.DepositAccount":
+                    case "M13_Library.DepositAccount":
                         return DepositAccountTemplate;
                     default: return null;
                 }

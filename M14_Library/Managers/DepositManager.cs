@@ -3,20 +3,21 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using М13_Task1;
+using M13_Library;
 
-namespace M14_Task
+namespace M14_Library
 {
     public class DepositManager : User
     {
 
-        public event Action<string, Account, Account, float> ToLog;
-        public new event Action<string, Client, string, string> ToLog3;
+        public new event ClientChangesHendler ClientChangesNotify;
+        public event AccountTransferHandler AccountTransferNitify;
+
 
         Account accountInWork;
         DepositAccount depositInWork;
 
-        public DepositManager(string thisName, BankSystem bank) : 
+        public DepositManager(string thisName, BankSystem bank) :
             base(thisName, bank)
         { }
 
@@ -31,6 +32,19 @@ namespace M14_Task
         }
 
         /// <summary>
+        /// клиент в работе
+        /// </summary>
+        public override Client TheClient
+        {
+            get { return base.TheClient; }
+            set
+            {
+                base.TheClient = value;
+                AccountInWork = null;
+                DepositInWork = null;
+            }
+        }
+        /// <summary>
         /// счет в работе
         /// </summary>
         public Account AccountInWork
@@ -38,11 +52,14 @@ namespace M14_Task
             get { return accountInWork; }
             set
             {
+                if (value == null) accountInWork = value;
+                else
                 if (value.GetType() == typeof(Account))
-                    if (client != null)
-                        foreach (Account account in client.Accounts)
-                            if (account == value)
-                                accountInWork = value;
+                    //      if(client != null)
+                    foreach (Account account in client.Accounts)
+                        if (account == value)
+                            accountInWork = value;
+                OnPropertyChanged("AccountInWork");
             }
         }
 
@@ -54,11 +71,14 @@ namespace M14_Task
             get { return depositInWork; }
             set
             {
+                if (value == null) depositInWork = value;
+                else
                 if (value.GetType() == typeof(DepositAccount))
-                    if (client != null)
-                        foreach (Account account in client.Accounts)
-                            if (account == value)
-                                depositInWork = value;
+                    //    if (client != null)
+                    foreach (Account account in client.Accounts)
+                        if (account == value)
+                            depositInWork = value;
+                OnPropertyChanged("DepositInWork");
             }
         }
 
@@ -72,7 +92,7 @@ namespace M14_Task
             if (client != null)
             {
                 x = bank.NewDepositAccount(ref client);
-                ToLog3(MName, client, "DepositAdd", x.AccountNumber);
+                ClientChangesNotify?.Invoke(this, new ClientChangesEventArgs(client, "DepositAdd", x.AccountNumber));
                 return x;
             }
             return null;
@@ -84,16 +104,16 @@ namespace M14_Task
         /// <returns></returns>
         public bool MCloseDeposit()
         {
-            if (depositInWork != null) 
+            if (depositInWork != null)
             {
                 if (depositInWork.CloseAccount())
                 {
-                    ToLog3(MName, client, "DepositClose", depositInWork.AccountNumber);
+                    ClientChangesNotify?.Invoke(this, new ClientChangesEventArgs(client, "DepositClose", depositInWork.AccountNumber));
                     depositInWork = null;
                     return true;
                 }
-                else return false;         
-            }       
+                else return false;
+            }
             else return false;
         }
 
@@ -107,7 +127,8 @@ namespace M14_Task
             if (accountInWork != null && depositInWork != null)
             {
                 bool x = bank.TransferContr(accountInWork, depositInWork, sum);
-                if (x == true) ToLog(MName, accountInWork, depositInWork, sum);
+                if (x == true) AccountTransferNitify?.Invoke(this,
+                        new AccountTransferEventArgs(accountInWork, depositInWork, sum));
                 return x;
             }
             else return false;
@@ -124,10 +145,11 @@ namespace M14_Task
             if (accountInWork != null && depositInWork != null)
             {
                 bool x = bank.TransferContr(depositInWork, accountInWork, sum);
-                if (x == true) ToLog(MName, depositInWork, accountInWork, sum);
+                if (x == true) AccountTransferNitify?.Invoke(this,
+                        new AccountTransferEventArgs(depositInWork, accountInWork, sum));
                 return x;
             }
-            else return false;   
+            else return false;
         }
 
     }

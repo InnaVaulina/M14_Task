@@ -12,7 +12,8 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using М13_Task1;
+using M13_Library;
+using M14_Library;
 
 namespace M14_Task
 {
@@ -44,7 +45,8 @@ namespace M14_Task
             createPersonForm.Create += user1.MFNewPersonClient; 
 
             user2 = new AccountManager("Андрей", bankA);
-            user1.Create += user2.OnNewClientAdd;
+            //user1.Create += user2.OnNewClientAdd;
+            user1.ClientAddNotify += user2.OnNewClientAdd2;
 
             user3 = new DepositManager("Артем", bankA);
             user4 = new Consultant("Антон", bankA);

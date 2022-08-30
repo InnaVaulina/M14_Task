@@ -3,14 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using М13_Task1;
+using M13_Library;
 
-namespace M14_Task
+namespace M14_Library
 {
     public class Consultant : User
     {
-        public Consultant(string thisName, BankSystem bank) : 
-            base(thisName, bank) 
+        public Consultant(string thisName, BankSystem bank) :
+            base(thisName, bank)
         { }
 
         /// <summary>
@@ -22,6 +22,6 @@ namespace M14_Task
             return $"Здравствуйте! Меня зовут {MName}. " +
                 "Я консультант. Буду рад Вам помочь!";
         }
-        
+
     }
 }

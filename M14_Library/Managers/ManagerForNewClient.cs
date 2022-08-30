@@ -3,24 +3,24 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using М13_Task1;
+using M13_Library;
 
-namespace M14_Task
+namespace M14_Library
 {
     public class ManagerForNewClient : User
     {
-        public event Action<string, Client> ToLog2;
-        public event Action<Client> Create;
 
+        public event ClientChangesHendler ClientAddNotify;
 
-        public ManagerForNewClient(string thisName, BankSystem bank) : 
-            base(thisName, bank) { }
+        public ManagerForNewClient(string thisName, BankSystem bank) :
+            base(thisName, bank)
+        { }
 
         /// <summary>
         /// приветсвенное сообщение
         /// </summary>
         /// <returns></returns>
-        public override string HelloMessage() 
+        public override string HelloMessage()
         {
             return $"Здравствуйте! Меня зовут {MName}. " +
                 "Я работаю с новыми клиентами. Буду рад Вам помочь!";
@@ -38,8 +38,7 @@ namespace M14_Task
             string patronymicName)
         {
             TheClient = bank.NewPersonClient(familyName, firstName, patronymicName);
-            ToLog2(this.MName, this.TheClient);
-            Create(TheClient);
+            ClientAddNotify?.Invoke(this, new ClientChangesEventArgs(client, "Client", "New"));
         }
 
 
@@ -55,8 +54,7 @@ namespace M14_Task
             string representative)
         {
             TheClient = bank.NewOrganisationClient(name, inn, representative);
-            ToLog2(this.MName, this.TheClient);
-            Create(TheClient);
+            ClientAddNotify?.Invoke(this, new ClientChangesEventArgs(client, "Client", "New"));
         }
     }
 }

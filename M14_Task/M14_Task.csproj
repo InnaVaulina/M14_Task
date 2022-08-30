@@ -35,6 +35,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="M13_Library">
+      <HintPath>..\..\М13_Task1\М13_Task1\bin\Debug\M13_Library.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
@@ -69,13 +72,7 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Manager\AccountManager.cs" />
     <Compile Include="TemplateSelector.cs" />
-    <Compile Include="History\History.cs" />
-    <Compile Include="Manager\ManagerForNewClient.cs" />
-    <Compile Include="Manager\DepositManager.cs" />
-    <Compile Include="Manager\Consultant.cs" />
-    <Compile Include="Manager\User.cs" />
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
@@ -116,9 +113,9 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\М13_Task1\М13_Task1\М13_Task1.csproj">
-      <Project>{aa911307-fc83-453d-9674-50373850d3c5}</Project>
-      <Name>М13_Task1</Name>
+    <ProjectReference Include="..\M14_Library\M14_Library.csproj">
+      <Project>{31bbb6ca-cdc9-4d8c-a9c2-6055738ffca6}</Project>
+      <Name>M14_Library</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

@@ -3,18 +3,17 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using М13_Task1;
+using M13_Library;
 using System.Collections.ObjectModel;
 
-namespace M14_Task
+namespace M14_Library
 {
-
     /// <summary>
     /// журналы
     /// </summary>
     public class History
     {
-        public List<Log1> transfers;
+        public ObservableCollection<Log1> transfers;
         public ObservableCollection<Log2> addClient;
         ManagerForNewClient manager1;
         AccountManager manager2;
@@ -24,24 +23,27 @@ namespace M14_Task
 
 
         public History(
-            ManagerForNewClient m1, 
-            AccountManager m2, 
-            DepositManager m3, 
+            ManagerForNewClient m1,
+            AccountManager m2,
+            DepositManager m3,
             Consultant c1)
         {
             this.manager1 = m1;
             this.manager2 = m2;
             this.manager3 = m3;
             this.consultant1 = c1;
-            transfers = new List<Log1>();
+            transfers = new ObservableCollection<Log1>();
             addClient = new ObservableCollection<Log2>();
-            manager1.ToLog2 += ClientAdd;
-            manager1.ToLog3 += ClientCange;
-            manager2.ToLog += TransferAdd;
-            manager2.ToLog3 += ClientCange;
-            manager3.ToLog += TransferAdd;
-            manager3.ToLog3 += ClientCange;
-            consultant1.ToLog3 += ClientCange;
+
+            manager1.ClientChangesNotify += ClientCange2;
+            manager1.ClientAddNotify += ClientCange2;
+            manager2.ClientChangesNotify += ClientCange2;
+            manager3.ClientChangesNotify += ClientCange2;
+            consultant1.ClientChangesNotify += ClientCange2;
+
+            manager2.AccountTransferNitify += TransferAdd;
+            manager3.AccountTransferNitify += TransferAdd;
+
         }
 
         /// <summary>
@@ -51,77 +53,52 @@ namespace M14_Task
         /// <param name="get">счет отправителя</param>
         /// <param name="put">счет получателя</param>
         /// <param name="amount">сумма</param>
-        public void TransferAdd(string manager, Account get, Account put, float amount)
+        //public void TransferAdd(string manager, Account get, Account put, float amount)
+        public void TransferAdd(User manager, AccountTransferEventArgs e)
         {
-            
-                string getType = "";
-                string putType = "";
-                if (get.GetType() != typeof(DepositAccount)) getType = "Account";
-                else getType = "Deposit";
-                if (put.GetType() != typeof(DepositAccount)) putType = "Account";
-                else putType = "Deposit";
-            System.Windows.Application.Current.Dispatcher.Invoke(() =>
-            {
+            string getType = "";
+            string putType = "";
+            if (e.From.GetType() != typeof(DepositAccount)) getType = "Account";
+            else getType = "Deposit";
+            if (e.To.GetType() != typeof(DepositAccount)) putType = "Account";
+            else putType = "Deposit";
+            //System.Windows.Application.Current.Dispatcher.Invoke(() =>
+            //{
                 transfers.Add(new Log1(
                     DateTime.Now,
-                    manager,
-                    get.Client.ClientId,
-                    get.Client.Name(),
+                    manager.MName,
+                    e.From.Client.ClientId,
+                    e.From.Client.Name(),
                     getType,
-                    get.AccountNumber,
-                    put.Client.ClientId,
-                    put.Client.Name(),
+                    e.From.AccountNumber,
+                    e.To.Client.ClientId,
+                    e.To.Client.Name(),
                     putType,
-                    put.AccountNumber,
-                    amount));
-            });
+                    e.To.AccountNumber,
+                    e.Sum));
+            //}
+            //);
         }
 
-        /// <summary>
-        /// запись в журнале изменений о клиентах - новый клиент
-        /// </summary>
-        /// <param name="manager">исполнитель</param>
-        /// <param name="client">новый клиент</param>
-        public void ClientAdd(string manager, Client client)
-        {
 
-            System.Windows.Application.Current.Dispatcher.Invoke(() =>
-            {
-                addClient.Add(new Log2(
-                 DateTime.Now,
-                 manager,
-                 client.ClientId,
-                 client.Name()
-                 ));
-            });
-            
-        }
 
-        /// <summary>
-        /// запись в журнале изменений о клиентах - изменились данные
-        /// </summary>
-        /// <param name="manager">исполнитель</param>
-        /// <param name="client">клиент</param>
-        /// <param name="property">что изменилось</param>
-        /// <param name="val">значение</param>
-        public void ClientCange(string manager, Client client, string property, string val)
+        public void ClientCange2(User manager, ClientChangesEventArgs e)
         {
-            System.Windows.Application.Current.Dispatcher.Invoke(() =>
-            {
+            //System.Windows.Application.Current.Dispatcher.Invoke(() =>
+            //{
                 addClient.Add(new Log2(
                 DateTime.Now,
-                manager,
-                client.ClientId,
-                client.Name(),
-                property,
-                val
+                manager.MName,
+                e.Client.ClientId,
+                e.Client.Name(),
+                e.PropertyName,
+                e.PropertyValue
                 ));
-            });
-
-
-            
+            //});
         }
+
     }
+
 
     /// <summary>
     /// журнал переводов
@@ -226,9 +203,9 @@ namespace M14_Task
             string property,
             string propertyNewValue
             )
-        { 
-            this.time = time; 
-            this.managerName = managerName; 
+        {
+            this.time = time;
+            this.managerName = managerName;
             this.clientId = clientId;
             this.clientName = clientName;
             this.property = property;

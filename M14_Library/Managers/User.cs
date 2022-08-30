@@ -5,36 +5,35 @@ using System.Text;
 using System.Threading.Tasks;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
-using М13_Task1;
+using M13_Library;
 
-
-namespace M14_Task
+namespace M14_Library
 {
-    
-    public class User: INotifyPropertyChanged
+    public class User : INotifyPropertyChanged
     {
-        protected string MName;
+        public string MName;
         protected BankSystem bank;
         protected Client client;
-        
 
 
-        public event Action<string, Client, string, string> ToLog3;
+        public event ClientChangesHendler ClientChangesNotify;
+
+
 
         /// <summary>
         /// клиент
         /// </summary>
-        public virtual Client TheClient 
+        public virtual Client TheClient
         {
             get { return client; }
-            set 
+            set
             {
-                if (client != value && client!=null) 
+                if (client != value && client != null)
                     client.PropertyChange -= ClientPropertyChange;
                 if (value != null)
                 {
                     client = value;
-                    client.PropertyChange += ClientPropertyChange; 
+                    client.PropertyChange += ClientPropertyChange;
                 }
                 else client = null;
                 OnPropertyChanged("TheClient");
@@ -42,11 +41,11 @@ namespace M14_Task
 
         }
 
-       /// <summary>
-       /// исполнитель
-       /// </summary>
-       /// <param name="thisName"></param>
-       /// <param name="bank"></param>
+        /// <summary>
+        /// исполнитель
+        /// </summary>
+        /// <param name="thisName"></param>
+        /// <param name="bank"></param>
         public User(string thisName, BankSystem bank)
         {
             this.MName = thisName;
@@ -59,22 +58,24 @@ namespace M14_Task
         /// </summary>
         public string Name { get { return this.MName; } }
 
+
+
         /// <summary>
         /// приветсвенное сообщение
         /// </summary>
         /// <returns></returns>
         public virtual string HelloMessage() { return "Здравствуйте!"; }
 
+
+
         /// <summary>
         /// событие - изменились сведения о клиенте
         /// </summary>
         /// <param name="propertyName"></param>
         /// <param name="value"></param>
-        public void ClientPropertyChange(string propertyName, string value) 
+        public void ClientPropertyChange(string propertyName, string value)
         {
-            
-            ToLog3(MName, client, propertyName, value);
-            
+            ClientChangesNotify?.Invoke(this, new ClientChangesEventArgs(client, propertyName, value));
         }
 
         // INotifyPropertyChanged

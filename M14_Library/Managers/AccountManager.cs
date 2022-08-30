@@ -3,63 +3,68 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using М13_Task1;
+using M13_Library;
 
-namespace M14_Task
+namespace M14_Library
 {
     public class AccountManager : User
     {
- 
-        public event Action<string, Account, Account, float> ToLog;
-        public new event Action<string, Client, string, string> ToLog3;
 
-        Account accountInWork; 
+        public new event ClientChangesHendler ClientChangesNotify;
+        public event AccountTransferHandler AccountTransferNitify;
 
-        public AccountManager(string thisName, BankSystem bank) : 
+        Account accountInWork;
+
+        public AccountManager(string thisName, BankSystem bank) :
             base(thisName, bank)
         { accountInWork = null; }
 
         /// <summary>
         /// клиент в работе
         /// </summary>
-        public override Client TheClient 
+        public override Client TheClient
         {
             get { return base.TheClient; }
-            set 
-            { 
+            set
+            {
                 base.TheClient = value;
-                accountInWork = null;
+                AccountInWork = null;
             }
         }
 
         /// <summary>
         /// счет в работе
         /// </summary>
-        public Account AccountInWork 
-        { 
+        public Account AccountInWork
+        {
             get { return accountInWork; }
-            set 
-            { 
-                if(value.GetType() == typeof(Account))
-                if(client != null)
-                    foreach(Account account in client.Accounts)
-                        if(account == value)
-                            accountInWork = value; 
+            set
+            {
+                if (value == null) accountInWork = value;
+                else
+                if (value.GetType() == typeof(Account))
+                    //      if(client != null)
+                    foreach (Account account in client.Accounts)
+                        if (account == value)
+                            accountInWork = value;
+                OnPropertyChanged("AccountInWork");
             }
         }
 
         /// <summary>
         /// касса банка
         /// </summary>
-        public Account Cash 
-        { 
-            get { return bank.cash; }
-            set 
-            { 
-                bank.cash = value;
+        public Account Cash
+        {
+            get { return bank.Cash; }
+            set
+            {
+                bank.Cash = value;
                 OnPropertyChanged("Cash");
             }
         }
+
+        public Dictionary<string, Account> Accounts { get { return bank.accounts; } }
 
         /// <summary>
         /// приветсвенное сообщение
@@ -81,7 +86,7 @@ namespace M14_Task
             if (client != null)
             {
                 x = bank.NewAccount(ref client);
-                ToLog3(MName, client, "AccountAdd", x.AccountNumber);               
+                ClientChangesNotify?.Invoke(this, new ClientChangesEventArgs(client, "AccountAdd", x.AccountNumber));
                 return x;
             }
             return null;
@@ -97,7 +102,7 @@ namespace M14_Task
             if (accountInWork != null)
             {
                 accountInWork.CloseAccount();
-                ToLog3(MName, client, "AccountClose", accountInWork.AccountNumber);
+                ClientChangesNotify?.Invoke(this, new ClientChangesEventArgs(client, "AccountClose", accountInWork.AccountNumber));
                 accountInWork = null;
                 return true;
             }
@@ -111,7 +116,9 @@ namespace M14_Task
         /// <returns></returns>
         public bool MPutMoneyToCash(float sum)
         {
-            return Cash.PutMoney(bank.manageClient as IClient, sum);
+            bool x = Cash.PutMoney(bank.manageClient as IClient, sum);
+            OnPropertyChanged("Cash");
+            return x;
         }
 
         /// <summary>
@@ -121,7 +128,9 @@ namespace M14_Task
         /// <returns></returns>
         public bool MTakeMoneyFromCash(float sum)
         {
-            return Cash.GetMoney(bank.manageClient as IClient, sum);
+            bool x = Cash.GetMoney(bank.manageClient as IClient, sum);
+            OnPropertyChanged("Cash");
+            return x;
         }
 
         /// <summary>
@@ -131,13 +140,18 @@ namespace M14_Task
         /// <returns></returns>
         public bool MPutMoney(float sum)
         {
-            if (accountInWork != null) 
+            if (accountInWork != null)
             {
                 bool x = bank.TransferContr(Cash, accountInWork, sum);
-                if (x == true) ToLog(MName, Cash, accountInWork, sum);
+                if (x == true)
+                {
+                    AccountTransferNitify?.Invoke(this,
+                        new AccountTransferEventArgs(Cash, accountInWork, sum));
+                }
+
                 return x;
             }
-            return false;            
+            return false;
         }
 
         /// <summary>
@@ -147,16 +161,44 @@ namespace M14_Task
         /// <returns></returns>
         public bool MTakeMoney(float sum)
         {
-            if (accountInWork != null) 
+            if (accountInWork != null)
             {
                 bool x = bank.TransferContr(accountInWork, Cash, sum);
-                if (x == true) ToLog(MName, accountInWork, Cash, sum);
+                if (x == true) AccountTransferNitify?.Invoke(this,
+                                  new AccountTransferEventArgs(accountInWork, Cash, sum));
                 return x;
             }
-            return false;   
+            return false;
         }
 
-       
+
+
+
+        /// <summary>
+        /// открыть счет для нового клиента
+        /// </summary>
+        /// <param name="newClient"></param>
+        public void OnNewClientAdd(Client newClient)
+        {
+            Client x = this.TheClient;
+            this.TheClient = newClient;
+            this.MNewAccount();
+            this.TheClient = x;
+
+        }
+
+        public void OnNewClientAdd2(User user, ClientChangesEventArgs e)
+        {
+            User y = user;
+            y.TheClient = null;
+            Client x = this.TheClient;
+            this.TheClient = e.Client;
+            this.MNewAccount();
+            this.TheClient = x;
+            y.TheClient = e.Client;
+
+        }
+
         /// <summary>
         /// перевод между счетами разных клиентов
         /// </summary>
@@ -167,24 +209,26 @@ namespace M14_Task
         public bool MTransfer(Account get, Account put, float sum)
         {
             bool x = bank.TransferContr(get, put, sum);
-            if (x == true) ToLog(MName, get, put, sum);
+            if (x == true) AccountTransferNitify?.Invoke(this,
+                                  new AccountTransferEventArgs(get, put, sum));
             return x;
         }
 
-        /// <summary>
-        /// открыть счет для нового клиента
-        /// </summary>
-        /// <param name="newClient"></param>
-        public void OnNewClientAdd(Client newClient) 
+
+        public bool MTransfer(Account get, string putNumber, float sum)
         {
-            Client x = this.TheClient;
-            this.TheClient = newClient;
-            this.MNewAccount();
-            this.TheClient = x;
-
+            Account put = null;
+            try
+            {
+                put = bank.accounts[putNumber];
+            }
+            catch
+            {
+                throw new TransferExeption("Не верный счет получателя.");
+            }
+            if (put != null) return MTransfer(get, put, sum);
+            else return false;
         }
-
-       
 
     }
 }
